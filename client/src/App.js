@@ -5,7 +5,7 @@ import {
   Navigate
 } from "react-router-dom";
 
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {blue} from '@mui/material/colors';
@@ -23,6 +23,8 @@ import Navbar from "./components/navbar.component";
 
 import './App.css';
 
+import fetchAxios from './utilities/fetch';
+
 const theme = createTheme({
   palette: {
     primary: blue,
@@ -35,6 +37,16 @@ function App() {
     setUser(userData);
   }
   
+  const isAuth = async () => { 
+    const res = await fetchAxios.post('/auth');
+    updateUser(res.data);
+  }
+
+  useEffect(() => {
+    isAuth();
+  }, [])
+
+
   return (
 
     <div>

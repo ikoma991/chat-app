@@ -1,7 +1,8 @@
-import { useState,useEffect } from 'react';
-import { useContext } from 'react';
+import { useState,useEffect,useContext } from 'react';
 
 import { useParams } from 'react-router-dom';
+
+import fetchAxios from '../utilities/fetch';
 
 import {Grid, Container, Avatar, Typography,Box,TextField,IconButton,InputAdornment} from '@mui/material';
 
@@ -17,31 +18,42 @@ const ChatBoxContainer = () => {
     //Message area to
     const {id} = useParams();
     const userContext = useContext(UserContext);
-
     const [messageList,setMessageList] = useState([]); 
     const [message,setMessage] = useState('');
+    const [conversationName,setConversationName] = useState('');
+    const getConversationMessages = async (conversationId,userId) => {
+        if(conversationId == null) {
+            return;
+        }
+        const resConvoName = await fetchAxios.post('/getConversationName', {conversationId,userId});
+        const conversationNameData = resConvoName.data.conversationName;
+        setConversationName(conversationNameData);
+        const res = await fetchAxios.get(`/getMessages/${conversationId}`);
+        const data = res.data.organizedData;
+        if(data.messagesList.length !== 0) {
+            setMessageList(data.messagesList);
+        }else {
+            setMessageList([]);
+        }
+    } 
+
     useEffect(()=>{
-        //api call to receive current conversation message list as well as user/conversation name
-        setMessageList([
-            {id:1,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:2},
-            {id:2,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:1},
-            {id:3,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:2},
-            {id:4,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:1},
-            {id:5,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:1},
-            {id:6,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:1},
-            {id:7,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:2},
-            {id:8,message:'sfaasfasfas',imgUrl:'',date:new Date().toDateString(),userId:2},
-        ])
-    },[])
+        getConversationMessages(id,userContext.user.id);
+    },[id,userContext.user.id])
 
 
-    const onMessageSend = e => {
+    const onMessageSend = async e => {
         e.preventDefault();
         const messageFiltered =message.trim();
         if(messageFiltered !== '') {
+            const userId = userContext.user.id;
             //api call to send message
-            console.log(messageFiltered);
-            setMessageList([...messageList,{id:(messageList[messageList.length-1].id+1),message:messageFiltered,imgUrl:'',date:new Date().toDateString(),userId: userContext.user.id }])
+            const response = await fetchAxios.post('/sendMessage',{conversationId:id,message:messageFiltered,userId});
+            if(response){
+                const messageId = response.data.id;
+                const {message,imageUrl,date,userId} = response.data;
+                setMessageList([...messageList,{id:messageId,message:message,imgUrl:imageUrl,date:date,userId}]);
+            }
             setMessage('');
         }
         
@@ -60,7 +72,7 @@ const ChatBoxContainer = () => {
         <Grid item xs={9} >
             <Container  sx={{display:'flex',paddingTop:'1.5em',paddingBottom:'1.5em'}} >
               <Avatar src='' alt="Profile Picture" />
-              <Typography variant="h6" sx={{marginLeft:'1em'}}>NAME</Typography>
+              <Typography variant="h6" sx={{marginLeft:'1em'}}>{conversationName}</Typography>
             </Container>
 
             <MessageDisplay messageList ={messageList} />
