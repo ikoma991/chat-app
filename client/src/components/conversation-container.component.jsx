@@ -19,11 +19,14 @@ const ConversationContainer = () => {
     const [filteredConvo,setFilteredConvo] = useState([]);
 
     const handleSeachField = (e) => {
-        setSearchName(e.target.value);
-        setSearchName((state)=> {
-            const filteredConversations = conversations.filter(con => con.name.toLowerCase().includes(state.toLowerCase()) );
-            setFilteredConvo(filteredConversations);
-        });
+        if(conversations.length !== 0) {
+            setSearchName(e.target.value);
+            setSearchName((state)=> {
+                const filteredConversations = conversations.filter(con => con.name.toLowerCase().includes(state.toLowerCase()) );
+                setFilteredConvo(filteredConversations);
+                return state
+            });
+        }
     }
         const getConversations = async (usr) => {
             const id = usr.id;
