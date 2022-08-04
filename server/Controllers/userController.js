@@ -48,7 +48,7 @@ userController.register =  async (req,res)=>{
             });
         user.token = token;
         const allUsers = await User.find({_id:{ $ne: user._id }}).exec();
-        const conversationArr = allUsers.map(usr =>  ({name:usr.name,users:[usr._id,user._id],messages:[]} )  );
+        const conversationArr = allUsers.map(usr =>  ({name:usr.name,users:[usr._id,user._id],messages:[],imageUrl:usr.imageUrl} )  );
         const conversations = await Conversation.insertMany(conversationArr);
         user.conversations = conversations.map(conv => conv._id);
         user.save();

@@ -28,26 +28,13 @@ const ConversationContainer = () => {
         const getConversations = async (usr) => {
             const id = usr.id;
             const conversationData = await fetchAxios.post("/getConversations",{userId:id});
-            const conv = conversationData.data.conversations;
-            //send correct and reqyured data id,name, last message, img,unreadMessages
+            const allConversations = conversationData.data.conversations;
+            const orderedConversationData = allConversations.map(conv => ({id:conv.id,name:conv.name,message:conv.lastMessage,img:conv.imageUrl,unread:conv.unreadCount}) )
+            setConversations(orderedConversationData);
         }
     useEffect(() => {
         getConversations(user);
-    //   setConversations([
-    //       {id:1,name:'John doe',message:'ancsda',img:'',unread:2},
-    //       {id:2,name:'Jen doe',message:'ancsdafsaf',img:'',unread:1},
-    //       {id:3,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:4},
-    //       {id:4,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:5,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:6,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:7,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:8,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:9,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:10,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0},
-    //       {id:11,name:'Joni doe',message:'anfsafascsfsafasfaffsafasfsafasda',img:'',unread:0}
-          
-    //     ]);
-    }, [])
+    }, [user])
     
 
 

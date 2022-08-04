@@ -4,6 +4,9 @@ const conversationSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+     imageUrl:{
+        type:String
+    },
     messages:[
         {
             type:mongoose.Schema.Types.ObjectId,

@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Conversation = require('../models/conversationModel');
+const Message = require('../models/messageModel');
 const mongoose = require('mongoose');
 const validator = require('validator')
 
@@ -7,9 +8,14 @@ const conversationController = {};
 conversationController.getAllConversations= async (req,res) =>{
  const userId = validator.trim(req.body.userId);
  try{
-     const user = await User.findOne({_id:userId}).populate("conversations");
+     const user = await User.findOne({_id:userId}).populate({path: 'conversations', populate : {
+        path:'messages'
+     }}).exec();
+     // Unread Count will be calculated through message unread by property 
+
+     const orderedConversationData = user.conversations.map(conv => ({id:conv._id,name:conv.name,imageUrl: conv.imageUrl ? conv.imageUrl : "",lastMessage:conv.messages[conv.messages.length-1] ? conv.messages[conv.messages.length-1] : "Start a new conversation!",unreadCount:0 }) );
      res.status(201).json({
-        conversations: user.conversations
+        conversations: orderedConversationData
      })
 }catch(err){
     console.log(err);
