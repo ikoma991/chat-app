@@ -25,7 +25,7 @@ const ChatBoxContainer = () => {
         if(conversationId == null) {
             return;
         }
-        const resConvoName = await fetchAxios.post('/getConversationName', {conversationId,userId});
+        const resConvoName = await fetchAxios.post('/getConversationName', {conversationId});
         const conversationNameData = resConvoName.data.conversationName;
         setConversationName(conversationNameData);
         const res = await fetchAxios.get(`/getMessages/${conversationId}`);

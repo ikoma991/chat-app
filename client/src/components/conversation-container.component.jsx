@@ -37,7 +37,7 @@ const ConversationContainer = () => {
         }
     useEffect(() => {
         getConversations(user);
-    }, [user])
+    }, [user,conversations])
     
 
 
