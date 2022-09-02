@@ -14,7 +14,7 @@ messageController.createMessage = asyncHandler ( async (userId,conversationId,me
         conversation.save();
         await User.findByIdAndUpdate(userId,{$addToSet:{messages:messageData._id}},{new:true});
         const data = await Message.findOne(messageData._id).populate('user').exec();
-        const organizedData = {id:messageData._id,message:messageData.message,imageUrl:data.user.imageUrl ? data.user.imageUrl : "",date:messageData.createdAt,userId }
+        const organizedData = {id:messageData._id,message:messageData.message,imageUrl:data.user.imageUrl ? data.user.imageUrl : "",date:messageData.createdAt,userId,members: usersInConversation.filter(usr => usr._id != userId) }
         return organizedData;
 }}
 );

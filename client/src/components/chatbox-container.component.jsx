@@ -1,4 +1,4 @@
-import { useState,useEffect,useContext } from 'react';
+import { useState,useEffect } from 'react';
 
 import { useParams } from 'react-router-dom';
 
@@ -11,17 +11,41 @@ import SendIcon from '@mui/icons-material/Send';
 import MessageDisplay from './message-display.component';
 
 import UserContext from '../context/userContext';
+import { useContext } from 'react';
 
-const ChatBoxContainer = () => {
+const ChatBoxContainer = ({socket}) => {
     //Receiver's info
     //Actual Chatbox
     //Message area to
+
     const {id} = useParams();
-    const userContext = useContext(UserContext);
+    const [conversationName,setConversationName] = useState('');
     const [messageList,setMessageList] = useState([]); 
     const [message,setMessage] = useState('');
-    const [conversationName,setConversationName] = useState('');
-    const getConversationMessages = async (conversationId,userId) => {
+    const [arrivalMessage,setArrivalMessage] = useState(null);
+    const userContext = useContext(UserContext);
+    useEffect(()=>{
+    if (typeof socket !== "undefined") {
+      if (socket.connected === true) {
+         socket.on("getMessage", (data) => {
+                setArrivalMessage({
+                    id:data.id,
+                    userId: data.senderId,
+                    message: data.message,
+                    date: data.date,
+                    imgUrl:data.imgUrl
+                });
+                });
+      }
+    }
+    },[socket])
+    useEffect(() => {
+        arrivalMessage &&
+        setMessageList((prev) => [...prev, arrivalMessage]);
+    }, [arrivalMessage,setMessageList]);
+
+    useEffect(()=>{
+        const getConversationMessages = async (conversationId) => {
         if(conversationId == null) {
             return;
         }
@@ -35,12 +59,20 @@ const ChatBoxContainer = () => {
         }else {
             setMessageList([]);
         }
-    } 
+    }     
+        getConversationMessages(id);
+    },[id,setMessageList])
 
-    useEffect(()=>{
-        getConversationMessages(id,userContext.user.id);
-    },[id,userContext.user.id])
-
+    
+    const handleMessageField = e => {
+        setMessage(e.target.value);
+    }
+    const handleMessageEnter = e => {
+        if(e.key === 'Enter'){
+            onMessageSend(e);
+            e.preventDefault();
+        }
+    }
 
     const onMessageSend = async e => {
         e.preventDefault();
@@ -52,21 +84,22 @@ const ChatBoxContainer = () => {
             if(response){
                 const messageId = response.data.id;
                 const {message,imageUrl,date,userId} = response.data;
+                socket.emit("sendMessage", {
+                    id:messageId,
+                    senderId: userId,
+                    receiverId: response.data.members[0],
+                    message,
+                    imgUrl:imageUrl,
+                    date:date
+                });
+
                 setMessageList([...messageList,{id:messageId,message:message,imgUrl:imageUrl,date:date,userId}]);
             }
             setMessage('');
         }
         
     }
-    const handleMessageField = e => {
-        setMessage(e.target.value);
-    }
-    const handleMessageEnter = e => {
-        if(e.key === 'Enter'){
-            onMessageSend(e);
-            e.preventDefault();
-        }
-    }
+
     return(
         id === undefined ? (<div></div>) : (
         <Grid item xs={9} >
@@ -75,7 +108,7 @@ const ChatBoxContainer = () => {
               <Typography variant="h6" sx={{marginLeft:'1em'}}>{conversationName}</Typography>
             </Container>
 
-            <MessageDisplay messageList ={messageList} />
+            <MessageDisplay messageList ={messageList ? messageList : []} />
 
             <Container sx={{marginLeft:'.5em',marginTop:'.8em'}} maxWidth='md'>
                 <Box component='form' noValidate onSubmit={onMessageSend}>
