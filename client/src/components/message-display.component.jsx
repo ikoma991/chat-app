@@ -1,6 +1,6 @@
 import {useRef,useEffect} from 'react';
 
-import {Container,Stack,Skeleton} from '@mui/material'
+import {Container,Stack} from '@mui/material'
 
 import Message from './message.component';
 
