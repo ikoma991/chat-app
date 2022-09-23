@@ -23,12 +23,7 @@ return (
                         backgroundColor: 'rgba(0,0,0,.1)',
                     }}} maxWidth='md'>
         <Stack spacing={2}>
-            {
-                messageList.length !== 0 ?
-            (messageList.map(messageData => <Message key = {messageData.id} senderData = {messageData} /> ))
-            :
-            (<Skeleton variant="rounded" width={800} height={400} />)
-            }
+            {messageList.map(messageData => <Message key = {messageData.id} senderData = {messageData} /> )}
             <div ref = {bottomEl}></div>
         </Stack>
     </Container>

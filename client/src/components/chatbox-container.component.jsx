@@ -111,14 +111,9 @@ const ChatBoxContainer = ({socket}) => {
                 (<Skeleton variant="rectangular" width={800} height={700} />)
                 :
                 (<>
-                <Container  sx={{display:'flex',paddingTop:'1.5em',paddingBottom:'1.5em'}} >
-              {
-                  conversationName ? 
-                (<><Avatar src='' alt="Profile Picture" />
-                <Typography variant="h6" sx={{marginLeft:'1em'}}>{conversationName}</Typography></>)
-                :
-                (<Skeleton variant="text" width={200} height={50} />)
-              }
+            <Container  sx={{display:'flex',paddingTop:'1.5em',paddingBottom:'1.5em'}} >
+                <Avatar src='' alt="Profile Picture" />
+                <Typography variant="h6" sx={{marginLeft:'1em'}}>{conversationName}</Typography>
             </Container>
 
             <MessageDisplay messageList ={messageList ? messageList : []} />
