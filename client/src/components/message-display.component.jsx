@@ -1,6 +1,6 @@
 import {useRef,useEffect} from 'react';
 
-import {Container,Stack} from '@mui/material'
+import {Container,Stack,Skeleton} from '@mui/material'
 
 import Message from './message.component';
 
@@ -23,7 +23,12 @@ return (
                         backgroundColor: 'rgba(0,0,0,.1)',
                     }}} maxWidth='md'>
         <Stack spacing={2}>
-            {messageList.map(messageData => <Message key = {messageData.id} senderData = {messageData} /> )}
+            {
+                messageList.length !== 0 ?
+            (messageList.map(messageData => <Message key = {messageData.id} senderData = {messageData} /> ))
+            :
+            (<Skeleton variant="rounded" width={800} height={400} />)
+            }
             <div ref = {bottomEl}></div>
         </Stack>
     </Container>

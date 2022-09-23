@@ -24,7 +24,7 @@ const Messenger = () => {
     useEffect(()=>{
         socketRef.current.emit("addUser",userContext.user.id);
         socketRef.current.on("getUsers", users=> {
-            console.log(users);
+            
         })
     },[userContext.user.id])
     return (

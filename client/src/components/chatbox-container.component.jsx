@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import fetchAxios from '../utilities/fetch';
 
-import {Grid, Container, Avatar, Typography,Box,TextField,IconButton,InputAdornment} from '@mui/material';
+import {Grid, Container, Avatar, Typography,Box,TextField,IconButton,InputAdornment,Skeleton} from '@mui/material';
 
 import SendIcon from '@mui/icons-material/Send';
 
@@ -23,6 +23,7 @@ const ChatBoxContainer = ({socket}) => {
     const [messageList,setMessageList] = useState([]); 
     const [message,setMessage] = useState('');
     const [arrivalMessage,setArrivalMessage] = useState(null);
+    const [isLoading,setIsLoading] = useState();
     const userContext = useContext(UserContext);
     useEffect(()=>{
     if (typeof socket !== "undefined") {
@@ -49,6 +50,7 @@ const ChatBoxContainer = ({socket}) => {
         if(conversationId == null) {
             return;
         }
+        setIsLoading(true);
         const resConvoName = await fetchAxios.post('/getConversationName', {conversationId});
         const conversationNameData = resConvoName.data.conversationName;
         setConversationName(conversationNameData);
@@ -59,6 +61,7 @@ const ChatBoxContainer = ({socket}) => {
         }else {
             setMessageList([]);
         }
+        setIsLoading(false)
     }     
         getConversationMessages(id);
     },[id,setMessageList])
@@ -103,9 +106,19 @@ const ChatBoxContainer = ({socket}) => {
     return(
         id === undefined ? (<div></div>) : (
         <Grid item xs={9} >
-            <Container  sx={{display:'flex',paddingTop:'1.5em',paddingBottom:'1.5em'}} >
-              <Avatar src='' alt="Profile Picture" />
-              <Typography variant="h6" sx={{marginLeft:'1em'}}>{conversationName}</Typography>
+            {
+                isLoading ?
+                (<Skeleton variant="rectangular" width={800} height={700} />)
+                :
+                (<>
+                <Container  sx={{display:'flex',paddingTop:'1.5em',paddingBottom:'1.5em'}} >
+              {
+                  conversationName ? 
+                (<><Avatar src='' alt="Profile Picture" />
+                <Typography variant="h6" sx={{marginLeft:'1em'}}>{conversationName}</Typography></>)
+                :
+                (<Skeleton variant="text" width={200} height={50} />)
+              }
             </Container>
 
             <MessageDisplay messageList ={messageList ? messageList : []} />
@@ -133,6 +146,9 @@ const ChatBoxContainer = ({socket}) => {
 
                 </Box>
             </Container>
+                </>)
+            }
+            
 
 
         </Grid>
